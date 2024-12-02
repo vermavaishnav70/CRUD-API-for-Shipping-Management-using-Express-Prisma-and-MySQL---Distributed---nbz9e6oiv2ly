@@ -1,10 +1,18 @@
-require('dotenv').config();
-const verifyToken = (req, res, next) => {
-    const secretKey = process.env.JWT_SECRET;
-    const token = req.headers.shipping_secret_key;
-    if (!token || token !== secretKey) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    next();
+require("dotenv").config();
+
+const verifySecret = (req, res, next) => {
+  const secretKey = req.headers["shipping_secret_key"];
+  if (!secretKey) {
+    return res
+      .status(403)
+      .json({ error: "SHIPPING_SECRET_KEY is missing or invalid" });
+  }
+  if (secretKey !== process.env.SHIPPING_SECRET_KEY) {
+    return res
+      .status(403)
+      .json({ error: "Failed to authenticate SHIPPING_SECRET_KEY" });
+  }
+  next();
 };
-module.exports = verifyToken;
+
+module.exports = verifySecret;
